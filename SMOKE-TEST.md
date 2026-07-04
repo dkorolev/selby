@@ -104,7 +104,31 @@ Open menu bar globe → **Settings…**:
   at the very top of a non-primary screen, the picker appears on *that*
   screen, not the primary one.
 
-## 9. The real flow
+## 9. Private windows
+
+In Settings, enable a private variant of an installed browser (e.g.
+"Google Chrome (Incognito)" or "Firefox (Private)"):
+
+- Expect: the variant row appears in Settings right below its base browser,
+  dimmed with its toggle off until enabled; once enabled it gets a picker
+  number like any other row.
+- With a **normal** window of that browser frontmost, trigger the picker
+  (step 4) and choose the private variant: the URL opens in a *private*
+  window — for Chrome, verify with
+  `osascript -e 'tell application "Google Chrome" to get mode of front window'`
+  printing `incognito` — and the browser comes to the front.
+- With the browser **not running**, choose the private variant: the browser
+  launches showing a private window with the URL.
+- Choosing the *normal* entry of the same browser still opens a regular
+  window.
+- **Safari (Private)** (scripted — Safari has no private-window flag, so
+  Selby clicks File → New Private Window via accessibility): on first use
+  expect the Accessibility prompt and/or Automation prompts for Safari and
+  System Events; after granting, retry — a Private Browsing window opens
+  with the URL (dark address bar). A burst of URLs lands as tabs of that
+  one private window.
+
+## 10. The real flow
 
 With Selby set as the system default browser, click a link in any app
 (Mail, Slack, a PDF…):

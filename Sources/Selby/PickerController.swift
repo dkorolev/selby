@@ -1,4 +1,5 @@
 import AppKit
+import ApplicationServices
 import SelbyCore
 import os
 
@@ -37,6 +38,8 @@ final class PickerController {
     /// click sequence would be silently dropped.
     private var reclaimableURLs: [URL] = []
     private var reclaimableSince: Date?
+    /// Private-window launches in flight; each removes itself on termination.
+    private var privateLaunchProcesses: [Process] = []
 
     /// Entry point for every incoming URL open.
     func present(urls incomingURLs: [URL]) {
@@ -151,6 +154,10 @@ final class PickerController {
     /// Hands the URLs to the chosen browser and lets it come to the front.
     private func open(_ urls: [URL], with browser: Browser) {
         log.notice("Opening \(urls.count) URL(s) in \(browser.name, privacy: .public)")
+        if let privateLaunch = browser.privateLaunch {
+            openPrivateWindow(urls, with: browser, launch: privateLaunch)
+            return
+        }
         let configuration = NSWorkspace.OpenConfiguration()
         configuration.activates = true
         NSWorkspace.shared.open(urls, withApplicationAt: browser.url, configuration: configuration) { _, error in
@@ -159,6 +166,128 @@ final class PickerController {
                     log.error("Failed to open in \(browser.name): \(error.localizedDescription)")
                     NSSound.beep()
                 }
+            }
+        }
+    }
+
+    /// Opens the URLs in a private window by invoking the browser binary with
+    /// its private-window flag — LaunchServices has no way to express "this
+    /// window mode", but every supported browser's command line forwards the
+    /// request to the running instance (or starts one). Safari has no such
+    /// command line and takes the scripted path instead.
+    private func openPrivateWindow(_ urls: [URL], with browser: Browser, launch: PrivateLaunch) {
+        if launch == .safariScripting {
+            openSafariPrivateWindow(urls, launch: launch)
+            return
+        }
+        guard let executable = Bundle(url: browser.url)?.executableURL else {
+            log.error("No executable in \(browser.url.path) for \(browser.name, privacy: .public)")
+            NSSound.beep()
+            return
+        }
+        let process = Process()
+        process.executableURL = executable
+        process.arguments = launch.arguments(for: urls)
+        launchAndRetain(process, name: browser.name, beepOnFailureExit: false)
+        activateBrowser(bundleID: browser.bundleID)
+    }
+
+    /// AppleScript that opens a Safari private window and loads argv's URLs
+    /// into it. Safari's scripting dictionary cannot create a private window,
+    /// so the script clicks File → New Private Window through accessibility —
+    /// matched by its shortcut metadata (⌘⇧N: cmd char "N", modifiers 1 =
+    /// shift+cmd), not by its localized name. A synthesized ⌘⇧N keystroke is
+    /// NOT used: keystroke delivery right after activation proved flaky, and
+    /// a menu-item click either lands or throws. Each wait aborts hard on
+    /// timeout rather than pressing on against an unknown UI state.
+    private static let safariPrivateScript = """
+    on run argv
+        tell application "Safari" to activate
+        tell application "System Events"
+            repeat 30 times
+                if frontmost of process "Safari" then exit repeat
+                delay 0.1
+            end repeat
+            if not frontmost of process "Safari" then error "Safari did not become frontmost"
+        end tell
+        tell application "Safari" to set oldCount to count of windows
+        tell application "System Events"
+            tell process "Safari"
+                set fileMenu to menu 1 of menu bar item 3 of menu bar 1
+                click (first menu item of fileMenu whose ¬
+                    value of attribute "AXMenuItemCmdChar" is "N" and ¬
+                    value of attribute "AXMenuItemCmdModifiers" is 1)
+            end tell
+        end tell
+        tell application "Safari"
+            repeat 30 times
+                if (count of windows) > oldCount then exit repeat
+                delay 0.1
+            end repeat
+            if (count of windows) is not greater than oldCount then error "no private window appeared"
+            set URL of current tab of front window to item 1 of argv
+            repeat with i from 2 to count of argv
+                tell front window to make new tab with properties {URL:item i of argv}
+            end repeat
+        end tell
+    end run
+    """
+
+    /// Runs the Safari private-window script via `osascript` (out of process,
+    /// so the delays inside it never block Selby). The menu-item click
+    /// requires Accessibility; when missing, this shows the system prompt and
+    /// bails — the user grants once and the next attempt works.
+    private func openSafariPrivateWindow(_ urls: [URL], launch: PrivateLaunch) {
+        let promptKey = kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String
+        guard AXIsProcessTrustedWithOptions([promptKey: true] as CFDictionary) else {
+            log.error("Safari private window needs Accessibility permission; prompted")
+            NSSound.beep()
+            return
+        }
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/osascript")
+        process.arguments = ["-e", Self.safariPrivateScript] + launch.arguments(for: urls)
+        // Beep on failure: a nonzero exit here means the user declined the
+        // Automation prompt (Safari or System Events) or the script broke.
+        launchAndRetain(process, name: "Safari (Private)", beepOnFailureExit: true)
+    }
+
+    /// Starts `process`, keeping a reference until exit so the child is
+    /// reaped, not zombied. A private-window forwarder exits in milliseconds;
+    /// a browser that wasn't already running IS this process and lives for
+    /// hours — which is why `beepOnFailureExit` must stay off for browser
+    /// binaries (their exit status at logout means nothing to the user).
+    private func launchAndRetain(_ process: Process, name: String, beepOnFailureExit: Bool) {
+        process.terminationHandler = { [weak self] finished in
+            let status = finished.terminationStatus
+            Task { @MainActor in
+                self?.privateLaunchProcesses.removeAll { $0 === finished }
+                if beepOnFailureExit, status != 0 {
+                    self?.log.error("\(name, privacy: .public) helper exited with status \(status)")
+                    NSSound.beep()
+                }
+            }
+        }
+        do {
+            try process.run()
+            privateLaunchProcesses.append(process)
+        } catch {
+            log.error("Failed to launch \(name, privacy: .public): \(error.localizedDescription)")
+            NSSound.beep()
+        }
+    }
+
+    /// Brings the browser frontmost after a private-window launch: a directly
+    /// spawned binary gets no LaunchServices activation, and a running
+    /// instance receiving a forwarded command stays in the background. Polls
+    /// briefly because a cold start takes a moment to register with AppKit.
+    private func activateBrowser(bundleID: String, attemptsLeft: Int = 10) {
+        if let app = NSRunningApplication.runningApplications(withBundleIdentifier: bundleID)
+            .first(where: { !$0.isTerminated }) {
+            app.activate()
+        } else if attemptsLeft > 1 {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+                self?.activateBrowser(bundleID: bundleID, attemptsLeft: attemptsLeft - 1)
             }
         }
     }

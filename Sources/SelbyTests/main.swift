@@ -53,10 +53,62 @@ check(PickerKey.digit(forKeyCode: 92) == 9, "keypad 9 maps to digit 9")
 check(PickerKey.digit(forKeyCode: 0) == nil, "letter key maps to no digit")
 check(PickerKey.digit(forKeyCode: 29) == nil, "kVK_ANSI_0 maps to no digit (rows are 1-based)")
 
+// MARK: - PrivateLaunch (pure)
+
+do {
+    // Force-unwraps are safe: the literals are well-formed URLs.
+    let urls = [URL(string: "https://a.com")!, URL(string: "https://b.com")!]
+    check(PrivateLaunch.flagBeforeURLs("--incognito").arguments(for: urls)
+          == ["--incognito", "https://a.com", "https://b.com"],
+          "Chromium-style flag goes once, ahead of all URLs")
+    check(PrivateLaunch.flagPerURL("-private-window").arguments(for: urls)
+          == ["-private-window", "https://a.com", "-private-window", "https://b.com"],
+          "Firefox-style flag repeats before each URL")
+    check(PrivateLaunch.safariScripting.arguments(for: urls)
+          == ["https://a.com", "https://b.com"],
+          "Safari scripting passes bare URLs as the script's argv")
+}
+
+// MARK: - Browser identity (pure)
+
+do {
+    let appURL = URL(fileURLWithPath: "/Applications/Firefox.app")
+    let normal = Browser(bundleID: "org.mozilla.firefox", name: "Firefox", url: appURL)
+    let priv = Browser(bundleID: "org.mozilla.firefox", name: "Firefox (Private)", url: appURL,
+                       privateLaunch: .flagPerURL("-private-window"))
+    check(normal.id == "org.mozilla.firefox", "normal entry's id is the bundle ID")
+    check(priv.id == "org.mozilla.firefox" + Browser.privateIDSuffix,
+          "private variant's id is bundle ID + suffix")
+    check(normal.id != priv.id, "variants persist independently")
+}
+
+// MARK: - Private-variant synthesis (pure)
+
+do {
+    let discovered = [
+        Browser(bundleID: "org.mozilla.firefox", name: "Firefox",
+                url: URL(fileURLWithPath: "/Applications/Firefox.app")),
+        Browser(bundleID: "com.apple.Safari", name: "Safari",
+                url: URL(fileURLWithPath: "/Applications/Safari.app")),
+        Browser(bundleID: "com.example.obscure", name: "Obscure",
+                url: URL(fileURLWithPath: "/Applications/Obscure.app")),
+    ]
+    let expanded = BrowserDiscovery.addingPrivateVariants(to: discovered)
+    check(expanded.map(\.name)
+          == ["Firefox", "Firefox (Private)", "Safari", "Safari (Private)", "Obscure"],
+          "known browsers gain an adjacent private variant; unknown ones don't")
+    check(expanded[1].privateLaunch == .flagPerURL("-private-window"),
+          "Firefox variant carries the -private-window launch")
+    check(expanded[3].privateLaunch == .safariScripting,
+          "Safari variant carries the scripted launch")
+    check(BrowserDiscovery.addingPrivateVariants(to: expanded) == expanded,
+          "synthesis is idempotent — variants don't beget variants")
+}
+
 // MARK: - BrowserOrdering (pure)
 
 func browser(_ id: String) -> Browser {
-    Browser(id: id, name: id, url: URL(fileURLWithPath: "/Applications/\(id).app"))
+    Browser(bundleID: id, name: id, url: URL(fileURLWithPath: "/Applications/\(id).app"))
 }
 
 do {
@@ -82,8 +134,8 @@ MainActor.assumeIsolated {
     @MainActor
     func makeModel(onFinish: @escaping (PickerOutcome) -> Void) -> PickerModel {
         let browsers = [
-            Browser(id: "com.example.a", name: "A", url: URL(fileURLWithPath: "/Applications/A.app")),
-            Browser(id: "com.example.b", name: "B", url: URL(fileURLWithPath: "/Applications/B.app")),
+            Browser(bundleID: "com.example.a", name: "A", url: URL(fileURLWithPath: "/Applications/A.app")),
+            Browser(bundleID: "com.example.b", name: "B", url: URL(fileURLWithPath: "/Applications/B.app")),
         ]
         // Force-unwrap is safe: the literal is a well-formed URL.
         let model = PickerModel(

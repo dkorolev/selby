@@ -18,7 +18,8 @@ struct SettingsView: View {
             Text("Browsers")
                 .font(.headline)
             Text("Toggle to show or hide. Drag to reorder — the picker, its 1–9 shortcuts, "
-                + "and ↩ (which always opens the top browser) follow this order.")
+                + "and ↩ (which always opens the top browser) follow this order. "
+                + "Private/Incognito entries start hidden; toggle them on to use them.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)

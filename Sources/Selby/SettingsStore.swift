@@ -6,13 +6,17 @@ import SelbyCore
 ///
 /// Persistence model: we store the set of *disabled* browser bundle IDs rather
 /// than enabled ones, so a newly installed browser shows up in the picker
-/// automatically instead of being silently hidden.
+/// automatically instead of being silently hidden. Private-window variants
+/// use the opposite polarity — an *enabled* set — so they are opt-in and
+/// don't double the picker's rows for everyone.
 @MainActor
 final class SettingsStore: ObservableObject {
     static let shared = SettingsStore()
 
     /// `UserDefaults` key holding the bundle IDs the user has hidden from the picker.
     private static let disabledKey = "disabledBrowserIDs"
+    /// `UserDefaults` key holding the private-variant IDs the user has opted into.
+    private static let enabledPrivateKey = "enabledPrivateBrowserIDs"
     /// `UserDefaults` key holding the user's manual browser order (bundle IDs).
     private static let orderKey = "browserOrder"
 
@@ -38,8 +42,14 @@ final class SettingsStore: ObservableObject {
         didSet { defaults.set(Array(disabledIDs).sorted(), forKey: Self.disabledKey) }
     }
 
+    /// Private-variant IDs the user has opted into showing in the picker.
+    @Published var enabledPrivateIDs: Set<String> {
+        didSet { defaults.set(Array(enabledPrivateIDs).sorted(), forKey: Self.enabledPrivateKey) }
+    }
+
     private init() {
         disabledIDs = Set(defaults.stringArray(forKey: Self.disabledKey) ?? [])
+        enabledPrivateIDs = Set(defaults.stringArray(forKey: Self.enabledPrivateKey) ?? [])
         browserOrder = defaults.stringArray(forKey: Self.orderKey) ?? []
         refresh()
     }
@@ -61,18 +71,28 @@ final class SettingsStore: ObservableObject {
 
     /// Browsers shown in the picker, in display order.
     var enabledBrowsers: [Browser] {
-        browsers.filter { !disabledIDs.contains($0.id) }
+        browsers.filter { isEnabled($0) }
     }
 
     func isEnabled(_ browser: Browser) -> Bool {
-        !disabledIDs.contains(browser.id)
+        browser.privateLaunch == nil
+            ? !disabledIDs.contains(browser.id)
+            : enabledPrivateIDs.contains(browser.id)
     }
 
     func setEnabled(_ enabled: Bool, for browser: Browser) {
-        if enabled {
-            disabledIDs.remove(browser.id)
+        if browser.privateLaunch == nil {
+            if enabled {
+                disabledIDs.remove(browser.id)
+            } else {
+                disabledIDs.insert(browser.id)
+            }
         } else {
-            disabledIDs.insert(browser.id)
+            if enabled {
+                enabledPrivateIDs.insert(browser.id)
+            } else {
+                enabledPrivateIDs.remove(browser.id)
+            }
         }
     }
 
