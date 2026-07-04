@@ -17,7 +17,8 @@ struct SettingsView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Browsers")
                 .font(.headline)
-            Text("Toggle to show or hide. Drag to reorder — the picker, its 1–9 shortcuts, and ↩ (which always opens the top browser) follow this order.")
+            Text("Toggle to show or hide. Drag to reorder — the picker, its 1–9 shortcuts, "
+                + "and ↩ (which always opens the top browser) follow this order.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)

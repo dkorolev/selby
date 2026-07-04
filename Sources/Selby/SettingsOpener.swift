@@ -38,6 +38,9 @@ final class SettingsOpener {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak window] in
             window?.level = .normal
         }
-        log.notice("Settings window ordered front (visible: \(window.isVisible), screen: \(window.screen?.localizedName ?? "none", privacy: .public))")
+        let screenName = window.screen?.localizedName ?? "none"
+        log.notice("""
+        Settings window ordered front (visible: \(window.isVisible), screen: \(screenName, privacy: .public))
+        """)
     }
 }

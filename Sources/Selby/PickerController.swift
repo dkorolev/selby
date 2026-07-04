@@ -77,7 +77,13 @@ final class PickerController {
             return
         }
         log.notice("Presenting picker: \(browsers.count) browsers for \(urls.count) URL(s)")
+        showPicker(for: urls, browsers: browsers)
+    }
 
+    /// Builds the model and panel for one picker invocation and puts it on
+    /// screen, key, at the mouse. `browsers` has at least two entries — the
+    /// zero- and one-browser cases were short-circuited in `present`.
+    private func showPicker(for urls: [URL], browsers: [Browser]) {
         previousApp = NSWorkspace.shared.frontmostApplication
         activatedDuringFallback = false
 

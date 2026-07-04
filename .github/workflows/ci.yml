@@ -5,6 +5,19 @@ on:
   pull_request:
 
 jobs:
+  lint:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: SwiftLint (strict)
+        run: |
+          command -v swiftlint >/dev/null || brew install swiftlint
+          # On CLT-only machines (local `act` runs) SwiftLint cannot find
+          # SourceKit on its own; GitHub runners have full Xcode and skip this.
+          if [[ "$(xcode-select -p)" == *CommandLineTools* ]]; then
+            export DYLD_FRAMEWORK_PATH="$(xcode-select -p)/usr/lib"
+          fi
+          swiftlint lint --strict
   build-and-test:
     runs-on: macos-15
     steps:

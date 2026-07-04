@@ -6,8 +6,11 @@ Tests gate code twice — once leaving the machine, once entering `main`:
 
 - **pre-push hook** — install once with `scripts/install-hooks.sh`; runs
   `swift build` + `swift run selby-tests` before every push.
-- **GitHub CI** (`.github/workflows/ci.yml`) — build, unit tests, and app
-  bundle assembly on every push and PR.
+- **GitHub CI** (`.github/workflows/ci.yml`) — SwiftLint (strict, rules in
+  `.swiftlint.yml`), build, unit tests, and app bundle assembly on every
+  push and PR. Run the same workflow locally with `scripts/ci-local.sh`
+  (requires [`act`](https://nektosact.com); jobs run on this machine, no
+  Docker needed).
 
 Local commits are not gated; commit freely.
 
