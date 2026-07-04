@@ -6,6 +6,8 @@ I needed to choose browsers dynamically on MacOS. The app I found quickly is app
 
 So I vibe-coded one. Never coded for MacOS before. But this appears to be functional and useful, so I'm keeping it and releasing it.
 
+https://github.com/user-attachments/assets/57042c87-fb87-4788-a67e-f6c192a65943
+
 Selby registers as your default browser; when you click a link in any app, a
 small menu appears at the mouse pointer and you pick which real browser opens
 it. No Dock icon, no background daemon, no configuration files — a single
