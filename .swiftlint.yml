@@ -1,0 +1,18 @@
+# SwiftLint defaults, run strict: warnings fail CI. The deviations below are
+# deliberate project style.
+included:
+  - Sources
+  - Package.swift
+  - scripts/make-icon.swift
+excluded:
+  - .build
+  - build
+  - tmp
+
+# Multiline collection literals keep a trailing comma (diff-friendly).
+trailing_comma:
+  mandatory_comma: true
+
+# Allow idiomatic two-letter names: dx/dy, the .up/.down picker keys.
+identifier_name:
+  min_length: 2
