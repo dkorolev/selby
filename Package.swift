@@ -12,6 +12,9 @@ let package = Package(
         // settings store, and browser discovery. A library so the UI test
         // harness can link it like any other target.
         .target(name: "Selby2Kit", dependencies: ["Selby2Core"]),
+        // The menu-bar agent: URL delivery, the picker's lifecycle, browser
+        // launching, and the Settings window.
+        .executableTarget(name: "Selby2", dependencies: ["Selby2Core", "Selby2Kit"]),
         // Minimal assertion helpers shared by the executable test runners.
         .target(name: "Selby2TestSupport"),
         // `swift run selby2-tests`: unit tests for Selby2Core. A plain
