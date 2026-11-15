@@ -10,7 +10,7 @@ import os
 final class SettingsWindow: NSObject, NSWindowDelegate {
     static let shared = SettingsWindow()
 
-    private let log = Logger(subsystem: "dev.selby.Selby2", category: "settings")
+    private let log = Logger(subsystem: "dev.selby.Selby", category: "settings")
     /// Created on first show, kept so later shows keep its position.
     private var window: NSWindow?
 

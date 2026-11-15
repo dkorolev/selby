@@ -4,7 +4,7 @@ import os
 
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
-    private let log = Logger(subsystem: "dev.selby.Selby2", category: "delivery")
+    private let log = Logger(subsystem: "dev.selby.Selby", category: "delivery")
     private let picker = PickerController(store: .shared, launcher: BrowserLauncher())
     /// URLs delivered before launch completed. macOS hands a launching app
     /// its URL before `applicationDidFinishLaunching`; a panel created that

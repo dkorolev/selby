@@ -7,7 +7,7 @@ import os
 /// choice, cancel, or the gear.
 @MainActor
 final class PickerController {
-    private let log = Logger(subsystem: "dev.selby.Selby2", category: "picker")
+    private let log = Logger(subsystem: "dev.selby.Selby", category: "picker")
     private let store: SettingsStore
     private let launcher: BrowserLauncher
 

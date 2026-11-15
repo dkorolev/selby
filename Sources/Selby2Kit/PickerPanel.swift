@@ -11,7 +11,7 @@ import os
 /// focus around, and a pending link must survive that.
 public final class PickerPanel: NSPanel {
     private let model: PickerModel
-    private let log = Logger(subsystem: "dev.selby.Selby2", category: "picker")
+    private let log = Logger(subsystem: "dev.selby.Selby", category: "picker")
     private var globalMouseMonitor: Any?
     private var localMouseMonitor: Any?
     private var presentedAt: TimeInterval = 0
