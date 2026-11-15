@@ -34,6 +34,10 @@ final class BrowserLauncher {
     /// loaded".
     func open(_ urls: [URL], in browser: Browser, onFailure: @escaping @MainActor (Error) -> Void) {
         log.notice("Opening \(urls.count) URL(s) in \(browser.name, privacy: .public)")
+        if browser.mainTab == .yabPersonal {
+            openYabPersonalTab(urls, name: browser.name, onFailure: onFailure)
+            return
+        }
         switch browser.privateLaunch {
         case nil:
             openNormally(urls, in: browser, onFailure: onFailure)
@@ -135,6 +139,53 @@ final class BrowserLauncher {
         end tell
     end run
     """
+
+    /// Asks Yab for a tab in its Personal space. Launch Services cannot say
+    /// that: Yab treats a link from another app as a Small Window. The first
+    /// run prompts for Automation, the same prompt Safari's private window uses.
+    private static let yabPersonalScript = """
+    on run argv
+        tell application "Yab"
+            activate
+            repeat 30 times
+                if (count of windows) > 0 then exit repeat
+                delay 0.1
+            end repeat
+            if (count of windows) is 0 then make new window
+            set targetWindow to missing value
+            repeat with w in windows
+                try
+                    if (count of spaces of w) > 0 then
+                        set targetWindow to w
+                        exit repeat
+                    end if
+                end try
+            end repeat
+            if targetWindow is missing value then set targetWindow to window 1
+            tell targetWindow
+                set targetSpace to space 1
+                repeat with s in spaces
+                    if (id of s as text) is "\(YabRows.personalSpaceID)" then
+                        set targetSpace to s
+                        exit repeat
+                    end if
+                end repeat
+                repeat with i from 1 to count of argv
+                    tell targetSpace to make new tab with properties {URL:item i of argv}
+                end repeat
+            end tell
+        end tell
+    end run
+    """
+
+    private func openYabPersonalTab(
+        _ urls: [URL], name: String, onFailure: @escaping @MainActor (Error) -> Void
+    ) {
+        let script = Process()
+        script.executableURL = URL(fileURLWithPath: "/usr/bin/osascript")
+        script.arguments = ["-e", Self.yabPersonalScript] + urls.map(\.absoluteString)
+        run(script, name: name, onFailure: onFailure)
+    }
 
     /// Runs the script out of process so its waits never block Selby2. The
     /// menu click needs Accessibility; without it macOS shows its prompt and

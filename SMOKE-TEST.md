@@ -51,7 +51,17 @@ running, then again while it is:
 - "Make Selby2 the default browser…" produces the macOS dialog and the
   section then says Selby2 is the default.
 
-## 6. Private windows
+## 6. Yab
+
+With Yab installed, the picker lists **Yab (Small Window)** and **Yab
+(Personal)**.
+
+- Small Window opens Yab's small window over the app you clicked in.
+- Personal adds a tab in the Personal space of the window already open.
+  The first time, macOS asks to let Selby2 control Yab; after allowing,
+  the tab is in that space.
+
+## 7. Private windows
 
 - Enable "Google Chrome (Incognito)" (or Brave). With a normal Chrome window
   frontmost, choose it: a new incognito window opens with the URL;
@@ -61,7 +71,7 @@ running, then again while it is:
 - Enable "Safari (Private)". The first use prompts for Accessibility and
   Automation; after granting, a Private Browsing window opens with the URL.
 
-## 7. Failure
+## 8. Failure
 
 - Hide every browser, click a link: a beep and the Settings window.
 - Remove a test browser after it appears in the picker, then choose it: an

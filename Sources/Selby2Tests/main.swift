@@ -85,6 +85,31 @@ do {
     Harness.check(PrivateVariants.inserting(into: expanded), equals: expanded, "insertion is idempotent")
 }
 
+// MARK: - Yab rows
+
+do {
+    let yab = browser(YabRows.bundleID, name: "Yab")
+    let chrome = browser("com.google.Chrome", name: "Google Chrome")
+    let rows = YabRows.inserting(into: [yab, chrome])
+    Harness.check(rows.map(\.name), equals: ["Yab (Small Window)", "Yab (Personal)", "Google Chrome"],
+            "Yab becomes a Small Window row and a Personal row; other browsers are unchanged")
+    Harness.check(rows[0].id, equals: YabRows.bundleID, "the Small Window row keeps Yab's bundle ID")
+    Harness.check(rows[1].id, equals: YabRows.bundleID + Browser.personalIDSuffix,
+            "the Personal row has its own id")
+    Harness.check(rows[1].mainTab, equals: MainTab.yabPersonal, "the Personal row opens a tab in Personal")
+    Harness.check(rows[0].mainTab, equals: nil as MainTab?, "the Small Window row uses the ordinary handoff")
+    Harness.check(rows[1].bundleID, equals: YabRows.bundleID, "both rows launch the same app")
+    Harness.check(YabRows.inserting(into: rows), equals: rows, "Yab row insertion is idempotent")
+
+    var settings = Settings()
+    Harness.check(settings.visible(rows).map(\.name),
+            equals: ["Yab (Small Window)", "Yab (Personal)", "Google Chrome"],
+            "both Yab rows are visible by default")
+    settings.setVisible(false, rows[1])
+    Harness.check(settings.visible(rows).map(\.id), equals: [YabRows.bundleID, "com.google.Chrome"],
+            "hiding Personal leaves the Small Window row")
+}
+
 // MARK: - Settings
 
 do {
