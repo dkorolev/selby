@@ -30,6 +30,11 @@ open a private window even when a normal window of the same browser is
 frontmost. Safari has no private-window command line, so Selby2 scripts it
 (see the permissions note below).
 
+**Yab** appears twice. **Yab (Small Window)** is what Yab does with a link
+from another app: a window over the app you clicked in. **Yab (Personal)**
+opens a tab in Yab's Personal space. The first time, macOS asks to let
+Selby2 control Yab.
+
 ## Install
 
 Requires macOS 14+ and the Xcode Command Line Tools (no Xcode).
@@ -88,6 +93,7 @@ macOS asks for your login password to trust the certificate. From then on
   pass the browser its own flag: through LaunchServices when it is not
   running, through a short-lived forwarder when it is. Safari's entry runs
   an AppleScript that clicks File › New Private Window via accessibility.
+  Yab (Personal) runs an AppleScript that makes a tab in that space.
 - Browsers are discovered with `NSWorkspace.urlsForApplications(toOpen:)`;
   there is no hardcoded browser list.
 

@@ -5,7 +5,8 @@ import Selby2Core
 public enum BrowserDiscovery {
     /// Installed HTTP(S) handlers, deduplicated by bundle ID, excluding the
     /// app itself, sorted by name, each followed by its private variant when
-    /// one exists. Costs a few milliseconds; safe to call per link click.
+    /// one exists. Yab is then split into Small Window and Personal. Costs a
+    /// few milliseconds; safe to call per link click.
     public static func installedBrowsers(excluding ownBundleID: String? = Bundle.main.bundleIdentifier) -> [Browser] {
         guard let probe = URL(string: "https://example.com") else { return [] }
         var seen = Set<String>()
@@ -19,7 +20,7 @@ public enum BrowserDiscovery {
             found.append(Browser(bundleID: bundleID, name: displayName(of: bundle), url: appURL))
         }
         let sorted = found.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
-        return PrivateVariants.inserting(into: sorted)
+        return YabRows.inserting(into: PrivateVariants.inserting(into: sorted))
     }
 
     private static func displayName(of bundle: Bundle) -> String {

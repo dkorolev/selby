@@ -32,9 +32,11 @@ public struct Browser: Identifiable, Hashable, Sendable {
     /// Appended to the bundle ID to form a private variant's `id`. `#` cannot
     /// appear in a bundle ID, so variant IDs never collide with app IDs.
     public static let privateIDSuffix = "#private"
+    /// Appended to Yab's bundle ID for the row that opens a tab in Personal.
+    public static let personalIDSuffix = "#personal"
 
     /// Stable identity for persistence: the bundle ID, or bundle ID plus
-    /// `privateIDSuffix`. Survives the app moving on disk or being updated.
+    /// a suffix for a variant. Survives the app moving on disk or being updated.
     public let id: String
     public let bundleID: String
     /// Human-readable name shown in the picker and in Settings.
@@ -43,15 +45,26 @@ public struct Browser: Identifiable, Hashable, Sendable {
     public let url: URL
     /// Present on private variants only.
     public let privateLaunch: PrivateLaunch?
+    /// Present on the row that opens a tab in a browser's main space.
+    public let mainTab: MainTab?
 
     public var isPrivate: Bool { privateLaunch != nil }
 
-    public init(bundleID: String, name: String, url: URL, privateLaunch: PrivateLaunch? = nil) {
-        self.id = privateLaunch == nil ? bundleID : bundleID + Self.privateIDSuffix
+    public init(
+        bundleID: String, name: String, url: URL, privateLaunch: PrivateLaunch? = nil, mainTab: MainTab? = nil
+    ) {
+        if mainTab != nil {
+            self.id = bundleID + Self.personalIDSuffix
+        } else if privateLaunch != nil {
+            self.id = bundleID + Self.privateIDSuffix
+        } else {
+            self.id = bundleID
+        }
         self.bundleID = bundleID
         self.name = name
         self.url = url
         self.privateLaunch = privateLaunch
+        self.mainTab = mainTab
     }
 
     /// This browser's private-window entry, named "<name> (<label>)".
