@@ -58,7 +58,7 @@ if [[ -z "$IDENTITY" ]] && security find-identity -v -p codesigning 2>/dev/null 
 elif [[ -z "$IDENTITY" ]] && security find-identity -v -p codesigning 2>/dev/null | grep -q '"Selby2 Local Signing"'; then
   IDENTITY="Selby2 Local Signing"
 fi
-codesign --force --sign "${IDENTITY:--}" --identifier dev.selby.Selby2 "$APP"
+codesign --force --sign "${IDENTITY:--}" --identifier dev.selby.Selby "$APP"
 echo "Built $APP, version ${VERSION:-0.0.0} ($BUILD_NUMBER), build $SHA, signed by ${IDENTITY:-ad-hoc signature}" >&2
 
 [[ "$INSTALL" == 1 ]] || exit 0

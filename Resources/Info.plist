@@ -7,7 +7,7 @@
 	<key>CFBundleDisplayName</key>
 	<string>Selby</string>
 	<key>CFBundleIdentifier</key>
-	<string>dev.selby.Selby2</string>
+	<string>dev.selby.Selby</string>
 	<key>CFBundleExecutable</key>
 	<string>Selby</string>
 	<key>CFBundlePackageType</key>

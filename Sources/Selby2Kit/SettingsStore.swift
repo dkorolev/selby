@@ -57,13 +57,17 @@ public final class SettingsStore: ObservableObject {
         defaults.set(data, forKey: Self.key)
     }
 
-    /// Reads the JSON blob. On first run, imports the three keys the
-    /// original Selby (bundle ID `dev.selby.Selby`) stored, so switching
-    /// keeps the user's order and toggles; `imported` asks the caller to
-    /// persist the result so the import happens once.
+    /// Reads the JSON blob. On first run under this bundle id, copies the
+    /// JSON the previous id `dev.selby.Selby2` stored. If that is absent,
+    /// imports the three keys the original Selby stored. `imported` asks
+    /// the caller to persist the result so the import happens once.
     private static func load(from defaults: UserDefaults) -> (settings: Settings, imported: Bool) {
-        if let data = defaults.data(forKey: key), let settings = try? JSONDecoder().decode(Settings.self, from: data) {
+        if let settings = decode(defaults.data(forKey: key)) {
             return (settings, false)
+        }
+        if let previous = UserDefaults(suiteName: "dev.selby.Selby2"),
+           let settings = decode(previous.data(forKey: key)) {
+            return (settings, true)
         }
         guard let legacy = UserDefaults(suiteName: "dev.selby.Selby") else { return (Settings(), false) }
         let settings = Settings(
@@ -72,5 +76,10 @@ public final class SettingsStore: ObservableObject {
             enabledPrivate: Set(legacy.stringArray(forKey: "enabledPrivateBrowserIDs") ?? [])
         )
         return (settings, settings != Settings())
+    }
+
+    private static func decode(_ data: Data?) -> Settings? {
+        guard let data else { return nil }
+        return try? JSONDecoder().decode(Settings.self, from: data)
     }
 }

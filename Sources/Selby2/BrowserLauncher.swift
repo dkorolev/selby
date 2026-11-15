@@ -25,7 +25,7 @@ enum LaunchError: LocalizedError {
 /// Hands URLs to a browser.
 @MainActor
 final class BrowserLauncher {
-    private let log = Logger(subsystem: "dev.selby.Selby2", category: "launch")
+    private let log = Logger(subsystem: "dev.selby.Selby", category: "launch")
     /// Short-lived helpers kept until they exit, so they are reaped.
     private var helpers: [Process] = []
 
