@@ -21,7 +21,7 @@ public enum BuildInfo {
     /// "1.2.3 (abc1234)" from a built bundle, "dev" under `swift run`.
     public static var label: String {
         let info = Bundle.main.infoDictionary ?? [:]
-        guard let sha = info["Selby2GitSHA"] as? String else { return "dev" }
+        guard let sha = info["SelbyGitSHA"] as? String else { return "dev" }
         let version = info["CFBundleShortVersionString"] as? String ?? "0"
         return "\(version) (\(sha))"
     }

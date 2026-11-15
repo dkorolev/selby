@@ -5,8 +5,8 @@ import Selby2Core
 public enum BrowserDiscovery {
     /// Installed HTTP(S) handlers, deduplicated by bundle ID, excluding the
     /// app itself, sorted by name, each followed by its private variant when
-    /// one exists. Yab is then split into Small Window and Personal. Costs a
-    /// few milliseconds; safe to call per link click.
+    /// one exists. Yab is then split into a new window and the default
+    /// window. Costs a few milliseconds; safe to call per link click.
     public static func installedBrowsers(excluding ownBundleID: String? = Bundle.main.bundleIdentifier) -> [Browser] {
         guard let probe = URL(string: "https://example.com") else { return [] }
         var seen = Set<String>()

@@ -1,12 +1,12 @@
-# Selby2
+# Selby
 
-Selby2 is a browser picker for macOS. It registers as the default browser;
+Selby is a browser picker for macOS. It registers as the default browser;
 when you click a link in any app, a small menu appears at the pointer and
 you choose which real browser opens it. No Dock icon, no daemon, no config
 files: a menu-bar agent that macOS launches on demand.
 
-It is a from-scratch rewrite of [Selby](https://github.com/dkorolev/selby),
-keeping its behavior and replacing its timing heuristics with tested state.
+This is a from-scratch rewrite of the earlier picker, keeping its behavior
+and replacing its timing heuristics with tested state.
 
 ## Usage
 
@@ -19,7 +19,7 @@ Click a link anywhere. The picker appears at the cursor:
   **Esc** or a click anywhere else dismisses.
 - Hover and click work too.
 
-**Settings** (the picker's gear, the menu-bar globe, or `open -a Selby2`)
+**Settings** (the picker's gear, the menu-bar globe, or `open -a Selby`)
 toggles which browsers appear and drags them into order. Browsers are
 discovered automatically, so a newly installed one shows up on its own.
 
@@ -27,13 +27,13 @@ discovered automatically, so a newly installed one shows up on its own.
 beta and dev channels, and Safari each get a "(Private)", "(Incognito)" or
 "(InPrivate)" entry. These start hidden; switch them on in Settings. They
 open a private window even when a normal window of the same browser is
-frontmost. Safari has no private-window command line, so Selby2 scripts it
+frontmost. Safari has no private-window command line, so Selby scripts it
 (see the permissions note below).
 
-**Yab** appears twice. **Yab (Small Window)** is what Yab does with a link
-from another app: a window over the app you clicked in. **Yab (Personal)**
-opens a tab in Yab's Personal space. The first time, macOS asks to let
-Selby2 control Yab.
+**Yab** appears twice. **Yab new window** is what Yab does with a link
+from another app: a window over the app you clicked in. **Yab default window**
+opens a tab in the window Yab already has. The first time, macOS asks to let
+Selby control Yab.
 
 ## Install
 
@@ -43,24 +43,23 @@ Requires macOS 14+ and the Xcode Command Line Tools (no Xcode).
 make install
 ```
 
-That builds, signs, copies the app to `~/Applications/Selby2.app`, makes it
+That builds, signs, copies the app to `~/Applications/Selby.app`, makes it
 the one copy LaunchServices knows, and launches it. Then make it the default
-browser: click "Make Selby2 the default browser…" in its Settings, or choose
+browser: click "Make Selby the default browser…" in its Settings, or choose
 it under System Settings › Desktop & Dock › Default web browser.
 
 Run `make install` again to upgrade. `make uninstall` removes it; set
 another default browser first.
 
-If you used the original Selby, your browser order and toggles are
-imported on first launch.
+An earlier install's browser order and toggles are imported on first launch.
 
 ### Downloaded builds
 
-Each tagged release ships `Selby2-vX.Y.Z.zip`. The app is ad-hoc signed, so
+Each tagged release ships `Selby-vX.Y.Z.zip`. The app is ad-hoc signed, so
 after unzipping, clear the quarantine flag before the first launch:
 
 ```sh
-xattr -dr com.apple.quarantine ~/Applications/Selby2.app
+xattr -dr com.apple.quarantine ~/Applications/Selby.app
 ```
 
 ### Keeping permissions across upgrades
@@ -80,7 +79,7 @@ macOS asks for your login password to trust the certificate. From then on
 ## How it works
 
 - `Resources/Info.plist` claims `http` and `https`, which is what makes
-  macOS offer Selby2 as a default browser.
+  macOS offer Selby as a default browser.
 - macOS hands clicked links to `application(_:open:)`. URLs that arrive
   before launch completes are held and presented once it has, because a
   panel created earlier cannot take keyboard focus.
@@ -93,7 +92,7 @@ macOS asks for your login password to trust the certificate. From then on
   pass the browser its own flag: through LaunchServices when it is not
   running, through a short-lived forwarder when it is. Safari's entry runs
   an AppleScript that clicks File › New Private Window via accessibility.
-  Yab (Personal) runs an AppleScript that makes a tab in that space.
+  Yab default window runs an AppleScript that makes a tab in that space.
 - Browsers are discovered with `NSWorkspace.urlsForApplications(toOpen:)`;
   there is no hardcoded browser list.
 

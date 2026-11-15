@@ -57,7 +57,7 @@ struct BrowserPickerView: View {
         VStack(spacing: 2) {
             Divider().padding(.horizontal, 4)
             HStack {
-                Text("Selby2 \(BuildInfo.label)")
+                Text("Selby \(BuildInfo.label)")
                     .font(.caption2)
                     .foregroundStyle(.secondary)
                 Spacer()
@@ -69,7 +69,7 @@ struct BrowserPickerView: View {
                         .foregroundStyle(.secondary)
                 }
                 .buttonStyle(.plain)
-                .help("Selby2 Settings")
+                .help("Selby Settings")
             }
             .frame(height: 16)
             .padding(.horizontal, 10)

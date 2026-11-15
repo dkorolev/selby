@@ -15,7 +15,7 @@ final class PickerController {
     private var model: PickerModel?
     private var reclaimable = ReclaimableLinks()
     /// The app the user was in; focus goes back to it if the activation
-    /// fallback made Selby2 active and the user then cancelled.
+    /// fallback made Selby active and the user then cancelled.
     private var previousApp: NSRunningApplication?
     private var activatedDuringFallback = false
 
@@ -89,7 +89,7 @@ final class PickerController {
         // keeps a stale hop from touching a replaced panel.
         DispatchQueue.main.async { [weak self, weak panel] in
             guard let self, let panel, panel === self.panel, !panel.isKeyWindow else { return }
-            self.log.notice("Panel not key; activating Selby2 as a fallback")
+            self.log.notice("Panel not key; activating Selby as a fallback")
             self.activatedDuringFallback = true
             NSApp.activate()
             panel.makeKeyAndOrderFront(nil)

@@ -5,18 +5,18 @@ pass.
 
 ## 1. Bundle
 
-- `codesign --verify build/Selby2.app` exits 0.
-- `open build/Selby2.app` shows a globe in the menu bar, no Dock icon, and
+- `codesign --verify build/Selby.app` exits 0.
+- `open build/Selby.app` shows a globe in the menu bar, no Dock icon, and
   the Settings window (a plain launch is a request for Settings).
 
 ## 2. Picker
 
-`open -a build/Selby2.app https://example.com/smoke`, with Selby2 not
+`open -a build/Selby.app https://example.com/smoke`, with Selby not
 running, then again while it is:
 
 - The panel appears at the mouse, with the URL middle-truncated above one
   row per visible browser, each with icon, name, and digit; the first row
-  is highlighted and shows ↩. The footer reads `Selby2 <version> (<sha>)`.
+  is highlighted and shows ↩. The footer reads `Selby <version> (<sha>)`.
 - The system log shows `Picker visible: true, key: true` for both the cold
   and the warm case:
   `log stream --predicate 'subsystem == "dev.selby.Selby2"' --style compact`
@@ -27,7 +27,7 @@ running, then again while it is:
 
 ## 3. Bursts
 
-- `open -a build/Selby2.app https://example.com/a https://example.com/b`
+- `open -a build/Selby.app https://example.com/a https://example.com/b`
   shows one picker reading `(+1 more)`; choosing opens both.
 - With the picker up, click a different link in another app: the new
   picker reads `(+1 more)` and choosing opens both.
@@ -48,17 +48,17 @@ running, then again while it is:
 - Every browser is listed with its picker number; hidden rows are dimmed.
   Toggling renumbers at once; dragging reorders, and the next picker
   matches. The order survives quit and relaunch.
-- "Make Selby2 the default browser…" produces the macOS dialog and the
-  section then says Selby2 is the default.
+- "Make Selby the default browser…" produces the macOS dialog and the
+  section then says Selby is the default.
 
 ## 6. Yab
 
-With Yab installed, the picker lists **Yab (Small Window)** and **Yab
-(Personal)**.
+With Yab installed, the picker lists **Yab new window** and **Yab default
+window**.
 
-- Small Window opens Yab's small window over the app you clicked in.
-- Personal adds a tab in the Personal space of the window already open.
-  The first time, macOS asks to let Selby2 control Yab; after allowing,
+- New window opens Yab's small window over the app you clicked in.
+- Default window adds a tab in the Personal space of the window already open.
+  The first time, macOS asks to let Selby control Yab; after allowing,
   the tab is in that space.
 
 ## 7. Private windows

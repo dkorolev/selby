@@ -30,7 +30,7 @@ final class SettingsWindow: NSObject, NSWindowDelegate {
     private func makeWindow() -> NSWindow {
         let hosting = NSHostingController(rootView: SettingsView(store: .shared))
         let window = NSWindow(contentViewController: hosting)
-        window.title = "Selby2 Settings"
+        window.title = "Selby Settings"
         window.styleMask = [.titled, .closable, .miniaturizable]
         window.isReleasedWhenClosed = false
         window.delegate = self
