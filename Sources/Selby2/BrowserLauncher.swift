@@ -13,7 +13,7 @@ enum LaunchError: LocalizedError {
         case .noExecutable(let name):
             return "\(name) has no executable to launch."
         case .accessibilityDenied:
-            return "Selby2 needs Accessibility access to open a Safari private window. "
+            return "Selby needs Accessibility access to open a Safari private window. "
                 + "Grant it in System Settings › Privacy & Security › Accessibility, then try again."
         case .helperFailed(let name, let status):
             return "The \(name) helper exited with status \(status). "

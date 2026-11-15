@@ -19,17 +19,18 @@ lint:
 	  DYLD_FRAMEWORK_PATH="$$(xcode-select -p)/usr/lib" swiftlint lint --strict --quiet; \
 	else swiftlint lint --strict --quiet; fi
 
-# build/Selby2.app, stamped and signed.
+# build/Selby.app, stamped and signed.
 app:
 	scripts/build.sh
 
-# Replace ~/Applications/Selby2.app and relaunch it.
+# Replace ~/Applications/Selby.app and relaunch it.
 install:
 	scripts/build.sh --install
 
 uninstall:
+	pkill -x Selby || true
 	pkill -x Selby2 || true
-	rm -rf ~/Applications/Selby2.app
+	rm -rf ~/Applications/Selby.app ~/Applications/Selby2.app
 
 icon:
 	swift scripts/make-icon.swift

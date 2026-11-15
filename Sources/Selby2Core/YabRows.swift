@@ -7,19 +7,21 @@ public enum MainTab: Hashable, Sendable {
     case yabPersonal
 }
 
-/// Yab shows up as two rows. Launch Services opens a Small Window, which is
-/// what Yab does with a link from another app. The second row asks Yab for a
-/// tab in Personal instead.
+/// Yab shows up as two rows. Launch Services opens a new small window, which
+/// is what Yab does with a link from another app. The other row asks Yab for
+/// a tab in the window already open, in its Personal space.
 public enum YabRows {
     public static let bundleID = "dev.serafim.fast"
     /// Yab's built-in first space. Its default name is Personal; the id
     /// stays if that name is edited.
     public static let personalSpaceID = "00000000-0000-0000-0000-000000000001"
-    public static let smallWindowLabel = "Small Window"
-    public static let personalLabel = "Personal"
+    /// Opens a new small window over the app that was clicked.
+    public static let newWindowLabel = "new window"
+    /// Opens a tab in the window Yab already has.
+    public static let defaultWindowLabel = "default window"
 
-    /// Replaces the plain Yab row with the Small Window row and inserts
-    /// Personal directly after it. Idempotent.
+    /// Replaces the plain Yab row with the new-window row and inserts the
+    /// default-window row directly after it. Idempotent.
     public static func inserting(into browsers: [Browser]) -> [Browser] {
         let existing = Set(browsers.map(\.id))
         return browsers.flatMap { browser -> [Browser] in
@@ -27,25 +29,31 @@ public enum YabRows {
                 return [browser]
             }
             let base = baseName(browser.name)
-            let small = Browser(bundleID: browser.bundleID, name: "\(base) (\(smallWindowLabel))", url: browser.url)
+            let newWindow = Browser(bundleID: browser.bundleID, name: "\(base) \(newWindowLabel)", url: browser.url)
             let personalID = browser.bundleID + Browser.personalIDSuffix
-            guard !existing.contains(personalID) else { return [small] }
-            let personal = Browser(
+            guard !existing.contains(personalID) else { return [newWindow] }
+            let defaultWindow = Browser(
                 bundleID: browser.bundleID,
-                name: "\(base) (\(personalLabel))",
+                name: "\(base) \(defaultWindowLabel)",
                 url: browser.url,
                 mainTab: .yabPersonal
             )
-            return [small, personal]
+            return [newWindow, defaultWindow]
         }
     }
 
     /// Drops a label this function itself added, so a second pass does not
-    /// nest "Yab (Small Window) (Small Window)".
+    /// nest "Yab new window new window". Also accepts the previous
+    /// parenthetical labels.
     private static func baseName(_ name: String) -> String {
-        for label in [smallWindowLabel, personalLabel] {
-            let suffix = " (\(label))"
-            if name.hasSuffix(suffix) { return String(name.dropLast(suffix.count)) }
+        let suffixes = [
+            " \(newWindowLabel)",
+            " \(defaultWindowLabel)",
+            " (Small Window)",
+            " (Personal)",
+        ]
+        for suffix in suffixes where name.hasSuffix(suffix) {
+            return String(name.dropLast(suffix.count))
         }
         return name
     }

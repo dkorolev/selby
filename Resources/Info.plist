@@ -3,18 +3,18 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleName</key>
-	<string>Selby2</string>
+	<string>Selby</string>
 	<key>CFBundleDisplayName</key>
-	<string>Selby2</string>
+	<string>Selby</string>
 	<key>CFBundleIdentifier</key>
 	<string>dev.selby.Selby2</string>
 	<key>CFBundleExecutable</key>
-	<string>Selby2</string>
+	<string>Selby</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
-	<!-- scripts/build.sh replaces the version, build number, and Selby2GitSHA. -->
+	<!-- scripts/build.sh replaces the version, build number, and SelbyGitSHA. -->
 	<key>CFBundleShortVersionString</key>
 	<string>0.0.0</string>
 	<key>CFBundleVersion</key>
@@ -32,7 +32,7 @@
 	<true/>
 	<key>CFBundleIconFile</key>
 	<string>AppIcon</string>
-	<!-- Claiming http/https is what makes macOS offer Selby2 as a default browser. -->
+	<!-- Claiming http/https is what makes macOS offer Selby as a default browser. -->
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -62,8 +62,8 @@
 			</array>
 		</dict>
 	</array>
-	<!-- Why Selby2 talks to Safari and System Events (the Safari (Private) entry). -->
+	<!-- Why Selby talks to Safari and System Events (the Safari (Private) entry). -->
 	<key>NSAppleEventsUsageDescription</key>
-	<string>Selby2 scripts Safari to open links in a private window.</string>
+	<string>Selby scripts Safari to open links in a private window.</string>
 </dict>
 </plist>

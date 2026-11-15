@@ -31,5 +31,5 @@ jobs:
       - name: App bundle
         run: |
           scripts/build.sh
-          codesign --verify --verbose=2 build/Selby2.app
-          plutil -lint build/Selby2.app/Contents/Info.plist
+          codesign --verify --verbose=2 build/Selby.app
+          plutil -lint build/Selby.app/Contents/Info.plist

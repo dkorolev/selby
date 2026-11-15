@@ -13,7 +13,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var finishedLaunching = false
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        log.notice("Selby2 launched, build \(BuildInfo.label, privacy: .public)")
+        log.notice("Selby launched, build \(BuildInfo.label, privacy: .public)")
         finishedLaunching = true
         SettingsStore.shared.refresh()
         if !pendingURLs.isEmpty {
@@ -23,7 +23,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             return
         }
         // AppKit says why it launched us: a plain launch (Finder, `open -a
-        // Selby2`, Launchpad) is the user asking for Settings; a launch to
+        // Selby`, Launchpad) is the user asking for Settings; a launch to
         // open a URL is not.
         let isDefaultLaunch = notification.userInfo?[NSApplication.launchIsDefaultUserInfoKey] as? Bool ?? true
         if isDefaultLaunch {
@@ -42,7 +42,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    /// Double-clicking Selby2 in Finder, or `open -a Selby2`, while it is
+    /// Double-clicking Selby in Finder, or `open -a Selby`, while it is
     /// already running: the way into Settings when a crowded menu bar hides
     /// the globe. Never over a pending picker.
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {

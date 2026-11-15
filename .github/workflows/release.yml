@@ -1,4 +1,4 @@
-# Tag v1.2.3 on main and a GitHub Release appears with Selby2.app zipped.
+# Tag v1.2.3 on main and a GitHub Release appears with Selby.app zipped.
 # The app is ad-hoc signed (no Apple Developer account), so a downloaded
 # copy carries the quarantine flag; the README has the one-line fix.
 name: Release
@@ -18,8 +18,8 @@ jobs:
       - name: Build app
         run: scripts/build.sh
       - name: Zip
-        run: ditto -c -k --keepParent build/Selby2.app "Selby2-${GITHUB_REF_NAME}.zip"
+        run: ditto -c -k --keepParent build/Selby.app "Selby-${GITHUB_REF_NAME}.zip"
       - name: Publish
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "$GITHUB_REF_NAME" "Selby2-${GITHUB_REF_NAME}.zip" --title "Selby2 $GITHUB_REF_NAME" --generate-notes
+        run: gh release create "$GITHUB_REF_NAME" "Selby-${GITHUB_REF_NAME}.zip" --title "Selby $GITHUB_REF_NAME" --generate-notes

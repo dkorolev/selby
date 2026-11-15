@@ -61,11 +61,11 @@ public struct SettingsView: View {
             Divider().padding(.vertical, 4)
 
             if status.isDefault {
-                Label("Selby2 is your default browser", systemImage: "checkmark.circle.fill")
+                Label("Selby is your default browser", systemImage: "checkmark.circle.fill")
                     .foregroundStyle(.green)
             } else {
-                Button("Make Selby2 the default browser…") { status.makeDefault() }
-                Text("Selby2 must be the macOS default browser to catch link clicks.")
+                Button("Make Selby the default browser…") { status.makeDefault() }
+                Text("Selby must be the macOS default browser to catch link clicks.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -97,9 +97,9 @@ public struct SettingsView: View {
                 Text("↩").font(.caption).foregroundStyle(.secondary)
             }
             Toggle("", isOn: visibleBinding(for: browser))
-                .toggleStyle(.switch)
-                .controlSize(.small)
+                .toggleStyle(GreenSwitchStyle())
                 .labelsHidden()
+                .accessibilityLabel("Show \(browser.name)")
         }
         .opacity(pickerIndex == nil ? 0.5 : 1)
         .padding(.vertical, 3)
@@ -117,5 +117,29 @@ public struct SettingsView: View {
 
     private func visibleBinding(for browser: Browser) -> Binding<Bool> {
         Binding(get: { store.isVisible(browser) }, set: { store.setVisible($0, browser) })
+    }
+}
+
+/// On is green. The system switch follows the accent color, which in this
+/// agent renders as a white track, so the on state is drawn explicitly.
+private struct GreenSwitchStyle: ToggleStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        let on = configuration.isOn
+        Button {
+            configuration.isOn.toggle()
+        } label: {
+            Capsule()
+                .fill(on ? Color.green : Color.primary.opacity(0.18))
+                .frame(width: 28, height: 16)
+                .overlay(alignment: on ? .trailing : .leading) {
+                    Circle()
+                        .fill(Color.white)
+                        .frame(width: 12, height: 12)
+                        .shadow(color: .black.opacity(0.28), radius: 0.4, y: 0.5)
+                        .padding(2)
+                }
+                .animation(.easeOut(duration: 0.12), value: on)
+        }
+        .buttonStyle(.plain)
     }
 }
