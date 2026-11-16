@@ -221,6 +221,27 @@ do {
     Harness.check(gate.allowsHover(at: CGPoint(x: 100, y: 100)), "once armed, hover stays armed")
 }
 
+// MARK: - RecentDeliveries
+
+do {
+    let t0 = Date(timeIntervalSince1970: 1000)
+    // 0.5 is exact in binary, so the boundary check is not a rounding accident.
+    var deliveries = RecentDeliveries(window: 0.5)
+    let page = url("https://a.com")
+    let other = url("https://b.com")
+    Harness.check(deliveries.fresh([page], at: t0), equals: [page], "a first delivery is kept")
+    Harness.check(deliveries.fresh([page], at: t0.addingTimeInterval(0.25)), equals: [],
+            "the same URL inside the window is the same click")
+    Harness.check(deliveries.fresh([other, page], at: t0.addingTimeInterval(0.25)), equals: [other],
+            "a different URL is kept while the repeated one is dropped")
+    Harness.check(deliveries.fresh([page, page], at: t0.addingTimeInterval(0.5)), equals: [page],
+            "the window is exclusive at its end, and one delivery keeps a single copy")
+    Harness.check(deliveries.fresh([page], at: t0.addingTimeInterval(0.75)), equals: [],
+            "a repeat of the delivery that just opened the window is dropped")
+    Harness.check(deliveries.fresh([page], at: t0.addingTimeInterval(-1)), equals: [page],
+            "a clock that went backwards does not swallow the URL")
+}
+
 // MARK: - ReclaimableLinks
 
 do {

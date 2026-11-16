@@ -1,4 +1,5 @@
 import AppKit
+import Selby2Core
 import Selby2Kit
 import os
 
@@ -11,6 +12,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     /// early cannot take key focus, so presentation waits for launch.
     private var pendingURLs: [URL] = []
     private var finishedLaunching = false
+    /// Same-click duplicates from an app that opens a link twice.
+    private var recentDeliveries = RecentDeliveries()
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         log.notice("Selby launched, build \(BuildInfo.label, privacy: .public)")
@@ -34,11 +37,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func application(_ application: NSApplication, open urls: [URL]) {
         guard !urls.isEmpty else { return }
-        log.notice("Received \(urls.count) URL(s) from macOS")
+        let fresh = recentDeliveries.fresh(urls, at: Date())
+        let repeated = urls.count - fresh.count
+        if repeated > 0 {
+            log.notice("Ignored \(repeated) repeated URL(s)")
+        }
+        guard !fresh.isEmpty else { return }
+        log.notice("Received \(fresh.count) URL(s) from macOS")
         if finishedLaunching {
-            picker.present(urls: urls)
+            picker.present(urls: fresh)
         } else {
-            pendingURLs += urls
+            pendingURLs += fresh
         }
     }
 
