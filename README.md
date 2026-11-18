@@ -17,6 +17,8 @@ Click a link anywhere. The picker appears at the cursor:
   Settings.
 - **↑ / ↓** move the selection (wrapping); **1–9** open that row;
   **Esc** or a click anywhere else dismisses.
+- **C** or **Copy URL** copies the link and closes the picker. If several links
+  are pending, Selby copies one per line in delivery order.
 - Hover and click work too.
 
 **Settings** (the picker's gear, the menu-bar globe, or `open -a Selby`)
@@ -85,7 +87,7 @@ macOS asks for your login password to trust the certificate. From then on
   panel created earlier cannot take keyboard focus.
 - The picker is a non-activating floating panel: it takes keyboard focus
   while the app you clicked in stays active. Losing focus never dismisses
-  it; only Escape, a click outside, a choice, or the gear does.
+  it; Escape, a click outside, Copy URL, a browser choice, or the gear closes it.
 - A second link clicked while the picker is up joins it, and the URLs of a
   picker that the click itself cancelled are reclaimed, so both open.
 - The chosen browser gets the URLs through LaunchServices. Private entries

@@ -12,6 +12,7 @@ public enum PickerCancelReason: Equatable, Sendable {
 /// How one picker invocation ended.
 public enum PickerOutcome: Equatable, Sendable {
     case chose(Browser)
+    case copyURLs
     case cancelled(PickerCancelReason)
     /// The gear button: close and show Settings instead.
     case openSettings
@@ -54,6 +55,7 @@ public struct PickerSession: Equatable, Sendable {
         else { return false }
         switch action {
         case .choose(let index): choose(index)
+        case .copyURLs: finish(.copyURLs)
         case .dismiss: cancel(.dismissed)
         case .moveSelection(let index): selection = index
         }

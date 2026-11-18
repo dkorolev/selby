@@ -20,6 +20,8 @@ running, then again while it is:
 - The system log shows `Picker visible: true, key: true` for both the cold
   and the warm case:
   `log stream --predicate 'subsystem == "dev.selby.Selby"' --style compact`
+- Press C on a link with a query and fragment. The picker closes without opening
+  a browser. Paste into a text editor and check that the whole URL is present.
 - Return opens the first browser. ↓ wraps from the last row to the first.
   A digit opens that row. Esc closes and focus returns to the previous app.
 - Hovering highlights; clicking opens. Clicking anywhere else dismisses.

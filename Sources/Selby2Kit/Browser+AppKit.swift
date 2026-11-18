@@ -12,7 +12,13 @@ extension Browser {
 extension PickerKey {
     /// Decodes an AppKit key event.
     public init?(event: NSEvent) {
-        self.init(keyCode: event.keyCode, characters: event.charactersIgnoringModifiers)
+        guard let key = PickerKey(keyCode: event.keyCode, characters: event.charactersIgnoringModifiers) else {
+            return nil
+        }
+        if key == .copyURLs, !event.modifierFlags.isDisjoint(with: [.command, .control, .option]) {
+            return nil
+        }
+        self = key
     }
 }
 

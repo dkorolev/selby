@@ -104,16 +104,25 @@ final class PickerController {
         switch outcome {
         case .chose(let browser):
             open(urls, with: browser)
+        case .copyURLs:
+            let pasteboard = NSPasteboard.general
+            pasteboard.clearContents()
+            pasteboard.setString(urls.map(\.absoluteString).joined(separator: "\n"), forType: .string)
+            restoreFocusIfNeeded(mustRestoreFocus)
         case .cancelled(let reason):
             log.notice("Picker cancelled: \(String(describing: reason), privacy: .public)")
             if reason == .outsideClick {
                 reclaimable.park(urls, at: Date())
             }
-            if mustRestoreFocus, NSApp.isActive {
-                previousApp?.activate()
-            }
+            restoreFocusIfNeeded(mustRestoreFocus)
         case .openSettings:
             SettingsWindow.shared.show()
+        }
+    }
+
+    private func restoreFocusIfNeeded(_ mustRestoreFocus: Bool) {
+        if mustRestoreFocus, NSApp.isActive {
+            previousApp?.activate()
         }
     }
 
