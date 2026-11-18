@@ -80,6 +80,11 @@ withPicker { panel, model, outcomes in
     panel.keyDown(with: keyDown(keyCode: 36, characters: "\r"))
     Harness.check(outcomes(), equals: [.chose(model.browsers[0])], "Return through the panel chooses the default row")
 }
+withPicker { panel, model, outcomes in
+    panel.keyDown(with: keyDown(keyCode: 8, characters: "c"))
+    model.choose(0)
+    Harness.check(outcomes(), equals: [.copyURLs], "C finishes the picker once without choosing a browser")
+}
 withPicker { panel, _, _ in
     panel.place(near: CGPoint(x: 500, y: 500), within: CGRect(x: 0, y: 0, width: 2000, height: 2000))
     let frame = panel.frame

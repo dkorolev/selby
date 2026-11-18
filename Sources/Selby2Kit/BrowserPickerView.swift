@@ -61,6 +61,11 @@ struct BrowserPickerView: View {
                     .font(.caption2)
                     .foregroundStyle(.secondary)
                 Spacer()
+                Button(model.urls.count == 1 ? "Copy URL (C)" : "Copy URLs (C)") {
+                    model.copyURLs()
+                }
+                .font(.caption2)
+                .buttonStyle(.plain)
                 Button {
                     model.requestSettings()
                 } label: {

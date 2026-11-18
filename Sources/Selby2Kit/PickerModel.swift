@@ -49,6 +49,10 @@ public final class PickerModel: ObservableObject {
         mutate { $0.cancel(reason) }
     }
 
+    public func copyURLs() {
+        mutate { $0.handle(.copyURLs) }
+    }
+
     public func requestSettings() {
         mutate { $0.requestSettings() }
     }

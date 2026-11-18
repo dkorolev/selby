@@ -35,6 +35,7 @@ Harness.check(PickerLogic.action(for: .down, selection: 0, count: 0), equals: .d
 
 // MARK: - PickerKey decoding
 
+Harness.check(PickerKey(keyCode: 8, characters: "C"), equals: .copyURLs, "uppercase C copies the pending links")
 Harness.check(PickerKey(keyCode: 36, characters: "\r"), equals: .accept, "Return is accept")
 Harness.check(PickerKey(keyCode: 76, characters: "\u{3}"), equals: .accept, "keypad Enter is accept")
 Harness.check(PickerKey(keyCode: 53, characters: "\u{1b}"), equals: .cancel, "Escape is cancel")

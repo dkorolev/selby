@@ -7,6 +7,7 @@ public enum PickerKey: Equatable, Sendable {
     case accept
     /// Escape: dismiss without opening anything.
     case cancel
+    case copyURLs
     case down
     case up
     /// Digit 1–9: open that row directly.
@@ -36,6 +37,8 @@ public enum PickerKey: Equatable, Sendable {
                 self = .digit(digit)
             } else if let characters, let digit = Int(characters), (1...9).contains(digit) {
                 self = .digit(digit)
+            } else if characters?.lowercased() == "c" {
+                self = .copyURLs
             } else {
                 return nil
             }
@@ -47,6 +50,7 @@ public enum PickerKey: Equatable, Sendable {
 public enum PickerAction: Equatable, Sendable {
     case choose(index: Int)
     case dismiss
+    case copyURLs
     case moveSelection(to: Int)
 }
 
@@ -59,6 +63,8 @@ public enum PickerLogic {
         switch key {
         case .accept:
             return .choose(index: selection)
+        case .copyURLs:
+            return .copyURLs
         case .cancel:
             return .dismiss
         case .down:
